@@ -1,0 +1,18 @@
+<!-- 
+
+* method slug()
+  /**
+  * Generate resource slug otomatis.
+  */
+  public function slug(Request $request)
+  {
+    $slug = SlugService::createSlug(
+      Role::class,
+      'slug',
+      $request->name
+    );
+
+    return response()->json(['slug' => $slug]);
+  }
+
+-->

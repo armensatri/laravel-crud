@@ -1,0 +1,40 @@
+<!-- 
+
+create seeder membuat data default sementara
+di comman line "php artisan make:seeder folder/namaseederSeeder"
+sebaiknya di samakan dengan nama modelnya
+
+[di method run()]
+public function run()
+{
+  $namavars = [
+    [
+      'field' => 'value',
+      'field' => 'value',
+    ],
+
+    [
+      'field' => 'value',
+      'field' => 'value',
+    ],
+  ];
+
+  foreach($namavars as $namavar) {
+    namamodel::create($namavar)
+  }
+}
+
+setelah itu import class seedernya ke file 
+"Seeders/DatabaseSeeder.php"
+class DatabaseSeeder extends Seeder
+{
+  public function run(): void
+  {
+    $this->call([
+      namaseederSeeder::class,
+    ]);
+  }
+}
+
+
+-->

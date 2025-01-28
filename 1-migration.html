@@ -1,0 +1,37 @@
+<!-- 
+
+ya pertama buat migration table menggunakan
+perintah di comand line, nama table harus jamak atau pakai "s"
+"php artisan make:migration create_namatable_table"
+
+[di file migration di method up()]
+public function up(): void
+{
+  Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    [cara membuat fieldnya]
+    $table->tipedatanya('namafile')->tambahanOptional()
+
+    [jika ada relasi antar table]
+    $table->foreignId('role_id')
+      ->references('id')
+      ->on('roles')
+      ->onDelete('cascade')
+      ->onUpdate('cascade');
+
+    [optional tambahana indexes]
+    $table->index('name');
+  })
+}
+
+[di method down() nya sesuaikan nama table di method up]
+public function down(): void
+{
+  [jika di up() ny nama users di down() nya juga sama]
+  Schema::dropIfExists('users');
+}
+
+
+
+
+-->

@@ -1,0 +1,109 @@
+<!-- 
+
+* buat model nya menggunakan comand line  "php artisan make::model folder/Namamodel" nama model huruf pertama harus huru besar
+
+class Namamodel extent Model 
+{
+  * [jika menggunakan sluggable tambahkan ini]
+  use Sluggable
+
+  * [nama tablenya apa]
+  protected $table = 'namatables';
+
+  * [field yang di isi apa saja]
+  protected $fillable = [
+    'filed',
+    'filed',
+  ];
+
+  * [route key name nya apa, ini digunakan dalam route crud]
+  public function getRouteKeyName()
+  {
+    return 'namafiledcrud';
+  }
+
+  * [tambahkan ini jika menggunakan sluggable]
+  public function sluggable(): array
+  {
+    return [
+      'slug' => [
+        'source' => 'fileyangdibuatkanslugotomatis'
+      ]
+    ];
+  }
+
+  * [selanjutnya tambahkan jika ada relasi antar models] belongsTo or hasMany
+
+  * [jika ada relasi vipot]
+  public function menus()
+  {
+    return $this->belongsToMany(
+      Menu::class,
+      'role_has_menu', // nama table vipot
+      'role_id', // primary key
+      'menu_id' // primary key
+    );
+  }
+
+  * [selanjutnya tambahkan ini scope searchnya jika scope searchnya bisa pakai scopeSearch() jika scope searchnya, draft pakai scopeDraft() ]
+  * [ini yang kompleks antar relasi models]
+  public function scopeSearch(Builder $query, array $filters): void
+  {
+    $fields = ['name', 'views'];
+
+    $relations = [
+      'status' => 'name'
+    ];
+
+    $query->when(
+      $filters['search'] ?? false,
+      function ($query, $search) use ($fields, $relations) {
+        Searching::applySearch($query, $search, $fields, $relations);
+      }
+    );
+  }
+
+  * [ini yang single models for scopeSearch() dan scoperDraft()]
+  public function scopeSearch(Builder $query, array $filters): void
+  {
+    $fields = ['name'];
+
+    $query->when(
+      $filters['search'] ?? false,
+      fn($query, $search) =>
+      $query->where(function ($query) use ($search, $fields) {
+        foreach ($fields as $fields) {
+          $query->orWhere($fields, 'like', '%' . $search . '%');
+        }
+      })
+    );
+  }
+
+  * [selanjutnya jika digunakan kalau ada, untuk mempersingkatkan url di browser]
+  protected static function boot()
+  {
+    parent::boot();
+
+    static::saving(function ($path) {
+      if (empty($path->url)) {
+        do {
+          $url = RandomUrl::GenerateUrl();
+        } while (Prgpath::where('url', $url)->exists());
+
+        $path->url = $url;
+      }
+    });
+  }
+
+  * optional ambil data manipulasi data
+  public function active(): array
+  {
+    return $this->is_active
+      ? ['bg' => 'green-200', 'text' => 'green-800', 'status' => 'active']
+      : ['bg' => 'red-200', 'text' => 'red-800', 'status' => '!active'];
+  }
+
+  * jika ada yang lain, optinal saja
+}
+
+-->

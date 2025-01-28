@@ -1,0 +1,15 @@
+<!-- 
+
+[tambahkan di bawah sekali di view create dan edit jika ada slug]
+<script>
+    const inputname = document.querySelector("#name");
+    const slug = document.querySelector("#slug");
+
+    inputname.addEventListener("change", function () {
+      fetch("/mu/roles/slug?name=" + inputname.value)
+        .then((response) => response.json())
+        .then((data) => (slug.value = data.slug));
+    });
+  </script>
+
+-->

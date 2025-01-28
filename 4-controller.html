@@ -1,0 +1,179 @@
+<!-- 
+
+pertama buat controller sekalian langsung modelsnya
+"php artisan make:controller folder/folder/NamacontrollersController --model=folder/Namamodel"
+Class Controller extends Controller
+{
+  * method index()
+  {
+    $namavariabels = User::search(request(['search', 'roles']))
+      ->select(['field-1', 'field-2'])
+      ->with(['relasimodel', 'relasimodels'])
+
+      [jika dalam 1 model, jika di draft ada atau tidak ada ]
+      ->where('namafield', value)
+      
+      [jika ada relasi antar model, jika di draft ada atau tidak ada ]
+      ->whereHas('status', function ($query) {
+        $query->where('name', '!=', 'draft');
+      })
+      
+      ->orderBy('id', 'asc')
+      ->paginate(15)
+      ->withQueryString();
+
+    return view('location.paths.jalur', [
+      'title' => 'title nya apa',
+      'namavariabels' => $namavariabels
+    ]);
+  }
+
+  * method draft()
+  {
+    $namavariabels = User::draft(request(['search', 'roles']))
+      ->select(['field-1', 'field-2'])
+      ->with(['relasimodel', 'relasimodels'])
+
+      [jika dalam 1 model, jika di draft ada atau tidak ada ]
+      ->where('namafield', value)
+      
+      [jika ada relasi antar model, jika di draft ada atau tidak ada ]
+      ->whereHas('status', function ($query) {
+        $query->where('name', '!=', 'draft');
+      })
+
+      ->orderBy('id', 'asc')
+      ->paginate(15)
+      ->withQueryString();
+
+    return view('location.paths.draftname', [
+      'title' => 'title nya apa',
+      'namavariabels' => $namavariabels
+    ]);
+  }
+
+  * method create()
+  public function create(User $user)
+  {
+    [jika ada model yang lain panggil]
+    $cobas = Coba::select('field', 'field')
+      ->orderby('id', 'as')
+      ->get()
+
+    return view('backend.manageuser.users.create', [
+      'title' => 'Create data user',
+      'user' => $user,
+      'panggilmodellain' => $panggilmodellain
+    ]);
+  }
+
+  * method store()
+  public function store(UserSr $request)
+  {
+    [panggil validasi di UserSr]
+    $datastore = $request->validated();
+
+    [jika ada, mempersingkat url di browser menggunakan random url 5 digit]
+    $datastore['url'] = $request->input('url')
+    ?: RandomUrl::GenerateUrl();
+
+    [ini untuk image]
+    if ($request->hasFile('image')) {
+      $datastore['image'] = $request->file('image')->store(
+        '/manageuser/users'
+      );
+    }
+
+    [model di create]
+    User::create($datastore);
+
+    [ini untuk role]
+    $user = User::create($datastore);
+    $role = Role::findOrFail($request->role_id);
+    $user->assignRole($role);
+
+    [ini alert pesan success]
+    Alert::success(
+      'success',
+      'Data user! berhasil di tambahkan.'
+    );
+
+    [redirect table index]
+    return redirect()->route('users.index');
+  }
+
+  * method show()
+  public function show(User $user)
+  {
+    return view('backend.manageuser.users.show', [
+      'title' => 'Detail data user',
+      'user' => $user
+    ]);
+  }
+
+  * method edit()
+  public function edit(User $user)
+  {
+    [jika ada model yang lain panggil]
+    $cobas = Coba::select('field', 'field')
+      ->orderby('id', 'as')
+      ->get()
+
+    return view('backend.manageuser.users.edit', [
+      'title' => 'Edit data user',
+      'user' => $user,
+      'panggilmodellain' => $panggilmodellain
+    ]);
+  }
+
+  * method update()
+  public function update(UserUr $request, User $user)
+  {
+    $dataupdate = $request->validated();
+
+    if (
+      $request->username != $user->username ||
+      $request->email != $user->email
+    ) {
+      $rules = [
+        'username' => 'unique:users,username' . $user->id,
+        'email' => 'unique:users,email' . $user->id,
+      ];
+
+      $messages = [
+        'username.unique' => 'User..username! sudah terdaptar',
+        'email.unique' => 'User..email! sudah terdaptar',
+      ];
+
+      $request->validate($rules, $messages);
+    }
+
+    if ($request->hasFile('image')) {
+      if ($user->image != null) {
+        Storage::delete($user->image);
+      }
+
+      $dataupdate['image'] = $request->file('image')->store(
+        '/manageuser/users'
+      );
+    }
+
+    $user->update($dataupdate);
+
+    if ($request->has('role_id')) {
+      $role = Role::findOrFail($request->role_id);
+      $user->syncRoles($role);
+    }
+
+    Alert::success(
+      'success',
+      'Data user! berhasil di update.'
+    );
+
+    return redirect()->route('users.index');
+  }
+
+  * method destroy()
+}
+
+-->
