@@ -1,0 +1,33 @@
+<!-- 
+
+1 download project setup-laravel di sini
+[ https://github.com/armensatri/setup-laravel ]
+
+2. ganti nama project [ bebas apa pun ]
+
+3. install composer [ composer install ]
+  install node_modules [ pnpm install ]
+
+4. buat file .env [ cp .env.example .env ]
+
+5. setting env
+  [ 
+    APP_KEY = [ php artisan key:generate ]
+    APP_TIMEZONE=Asia/Jakarta
+    APP_URL= [ url projectnya apa ]
+    aktifkan ini APP_MAINTENANCE_STORE=database
+    SESSION_DRIVER=file
+    FILESYSTEM_DISK=public
+    CACHE_STORE=file
+  ]
+  
+6. buat nama databasenya di config/database
+  
+7. lalu jalankan migration seed
+  [ php artisan migrate --seed
+
+8. hubungkan storage file
+  [ php artisan storage:link ]
+
+9 jalankan server app
+-->
