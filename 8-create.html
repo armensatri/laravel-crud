@@ -42,6 +42,17 @@
       </section>
     </div>
   </div>
+
+  <script>
+    const inputname = document.querySelector("#name");
+    const slug = document.querySelector("#slug");
+
+    inputname.addEventListener("change", function () {
+      fetch("roles/slug?name=" + inputname.value)
+        .then((response) => response.json())
+        .then((data) => (slug.value = data.slug));
+    });
+  </script>
 @endsection
 
 -->
