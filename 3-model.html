@@ -72,8 +72,8 @@ class Namamodel extent Model
       $filters['search'] ?? false,
       fn($query, $search) =>
       $query->where(function ($query) use ($search, $fields) {
-        foreach ($fields as $fields) {
-          $query->orWhere($fields, 'like', '%' . $search . '%');
+        foreach ($fields as $field) {
+          $query->orWhere($field, 'like', '%' . $search . '%');
         }
       })
     );
