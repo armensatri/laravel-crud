@@ -1,0 +1,93 @@
+<!-- 
+
+* pertama buat th di controller mana yang di buat
+* contoh rolesController
+<x-th
+  name="menu"
+/>
+
+* setelah itu buat link di td menerima 2 parameter id dan name
+<td class="h-px whitespace-nowrap">
+  <div class="center">
+    <x-role-access
+      :route="route('access', [
+        'id' => $role->id,
+        'name' => $role->name
+      ])"
+    />
+  </div>
+</td>
+
+* setelah itu buat routenya access get dan changeaccess post
+Route::group(['middleware' => ['auth']], function () {
+  Route::get('/roles/access/{id}/{name}', [
+    RolesController::class,
+    'access'
+  ])->name('access');
+
+  Route::post('/roles/changeaccess', [
+    RolesController::class,
+    'changeaccess'
+  ])->name('changeaccess');
+});
+
+* setelah itu buat method access di controller RolesController
+public function access($id)
+{
+  .// Mencari data role berdasarkan ID yang diberikan
+  .// Jika tidak ditemukan, akan langsung menampilkan error 404
+  $role = Role::findOrFail($id);
+
+  .// Mengambil data menu dengan kolom 'id', 'sm', dan 'name'
+  .// Data diurutkan berdasarkan kolom 'sm' secara ascending
+  .// Kemudian dilakukan paginasi dengan 10 data per halaman
+  $menus = Menu::select('id', 'sm', 'name')
+  ->orderBy('sm', 'asc')
+  ->paginate(10);
+
+  .// Mengembalikan tampilan 'backend.manageuser.roles.access' dengan data berikut:
+  .// - title: Berisi string "Role access" + nama role
+  .// - role: Data role yang ditemukan
+  .// - menus: Data menu yang sudah dipaginasi
+  return view('backend.manageuser.roles.access', [
+    'title' => 'Role access' . ' ' . $role->name,
+    'role' => $role,
+    'menus' => $menus
+  ]);
+}
+
+* selanjutnya buat tampilan acceess.blade.php
+access.blade.php
+
+* selanjutnya tambahkan input type checkbox
+<td class="size-px whitespace-nowrap">
+  <div class="center">
+    <input type="checkbox"
+      {{ \App\Helpers\LoginAccess::checkaccess($role['id'], $menu['id']) }}
+      data-role="{{ $role['id'] }}"
+      data-menu="{{ $menu['id'] }}"
+      data-role-name="{{ $role['name'] ?? '' }}"
+      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-400 rounded-md cursor-pointer access-checkbox"
+    />
+  </div>
+</td>
+
+* selanjutnya buat helper
+public static function checkaccess($roleId, $menuId)
+{
+  .// Mengakses tabel "role_has_menu" di database
+  .// Mencari berdasarkan kolom "role_id" sesuai parameter yang diberikan
+  .// Mencari berdasarkan kolom "menu_id" sesuai parameter yang diberikan
+  .// Mengecek apakah data dengan kombinasi role_id dan menu_id tersebut ada
+  .// Jika data ditemukan, kembalikan string "checked" agar checkbox tercentang di HTML
+  .// Jika data tidak ditemukan, kembalikan string kosong agar checkbox tidak tercentang
+
+  return DB::table('role_has_menu')
+    ->where('role_id', $roleId)
+    ->where('menu_id', $menuId)
+    ->exists() ? 'checked' : '';
+}
+
+
+
+-->
