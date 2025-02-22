@@ -1,12 +1,11 @@
 <!-- 
 
-* pertama buat th di controller mana yang di buat
-* contoh rolesController
+* pertama buat th di RolesController index.blade.php
 <x-th
   name="menu"
 />
 
-* setelah itu buat link di td menerima 2 parameter id dan name
+* selanjutnya buat td di RoleController index.blade.php yang menerima dua parameter di route, id dan name, ambil berdasarkan id
 <td class="h-px whitespace-nowrap">
   <div class="center">
     <x-role-access
@@ -18,48 +17,160 @@
   </div>
 </td>
 
-* setelah itu buat routenya access get dan changeaccess post
-Route::group(['middleware' => ['auth']], function () {
+* selanjutnya buat route access role yang yang menerima parameter id
   Route::get('/roles/access/{id}/{name}', [
     RolesController::class,
     'access'
   ])->name('access');
 
-  Route::post('/roles/changeaccess', [
-    RolesController::class,
-    'changeaccess'
-  ])->name('changeaccess');
-});
+  * buat method access yang menerima parameter id, di RolesController method access
+  public function access($id)
+  {
+    .// Mencari role berdasarkan ID, jika tidak ditemukan akan menghasilkan error 404
+    $role = Role::findOrFail($id);
 
-* setelah itu buat method access di controller RolesController
-public function access($id)
-{
-  .// Mencari data role berdasarkan ID yang diberikan
-  .// Jika tidak ditemukan, akan langsung menampilkan error 404
-  $role = Role::findOrFail($id);
+    .// Mengambil daftar menu dengan kolom id, sm, dan name
+    .// Data diurutkan berdasarkan kolom 'sm' secara ascending
+    .// Data dipaginasi dengan 10 item per halaman
+    $menus = Menu::select('id', 'sm', 'name')
+    ->orderBy('sm', 'asc')
+    ->paginate(10);
 
-  .// Mengambil data menu dengan kolom 'id', 'sm', dan 'name'
-  .// Data diurutkan berdasarkan kolom 'sm' secara ascending
-  .// Kemudian dilakukan paginasi dengan 10 data per halaman
-  $menus = Menu::select('id', 'sm', 'name')
-  ->orderBy('sm', 'asc')
-  ->paginate(10);
-
-  .// Mengembalikan tampilan 'backend.manageuser.roles.access' dengan data berikut:
-  .// - title: Berisi string "Role access" + nama role
-  .// - role: Data role yang ditemukan
-  .// - menus: Data menu yang sudah dipaginasi
-  return view('backend.manageuser.roles.access', [
+    .// Mengembalikan view 'backend.manageuser.roles.access' dengan data:
+    .// - title: Judul halaman berisi 'Role access' dan nama role
+    .// - role: Data role yang ditemukan
+    .// - menus: Daftar menu yang sudah dipaginasi
+    return view('backend.manageuser.roles.access', [
     'title' => 'Role access' . ' ' . $role->name,
     'role' => $role,
     'menus' => $menus
-  ]);
-}
+    ]);
+  }
 
-* selanjutnya buat tampilan acceess.blade.php
-access.blade.php
+* selanjutnya buat viewnya
+@extends('backend.template.main')
 
-* selanjutnya tambahkan input type checkbox
+@section('content-backend')
+  <div class="content">
+    <div class="p-4 mx-auto">
+      <section class="w-full px-4 mb-2">
+        <div class="app-content">
+          <div class="app-content-title">
+            {{ $title }}
+          </div>
+        </div>
+      </section>
+
+      @if (session()->has('alert'))
+        @include('sweetalert::alert')
+      @endif
+
+      <section class="w-full px-4 mt-8 mb-5">
+        <div class="max-w-[85rem] mx-auto">
+          <div class="flex flex-col">
+            <div class="-m-1.5 overflow-x-auto min-w-full">
+              <div class="p-1.5 inline-block xl:max-w-full align-middle leading-none">
+                <div class="overflow-hidden app-table-border">
+                  <div class="grid app-table-grid">
+                    <x-description
+                      table-name="access menu"
+                      :page-data="$menus"
+                    />
+
+                    <div class="indexs">
+                      <x-indexs
+                        :route="route('roles.index')"
+                        name="back to roles"
+                      />
+                    </div>
+                  </div>
+
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-200">
+                      <tr>
+                        <x-th
+                          name="no"
+                        />
+                        <x-th
+                          name="id"
+                        />
+                        <x-th
+                          name="sm"
+                        />
+                        <x-th
+                          name="menu"
+                        />
+                        <x-th-action/>
+                      </tr>
+                    </thead>
+
+                    <tbody class="tbody">
+                      @foreach ($menus as $menu)
+                        <tr>
+                          <td class="h-px whitespace-nowrap">
+                            <div class="my-1 center">
+                              <x-td-var
+                                :var="$loop->iteration . '.'"
+                              />
+                            </div>
+                          </td>
+
+                          <td class="h-px whitespace-nowrap">
+                            <div class="center">
+                              <x-td-var
+                                :var="$menu->id"
+                              />
+                            </div>
+                          </td>
+
+                          <td class="h-px whitespace-nowrap">
+                            <div class="center">
+                              <x-td-var
+                                :var="$menu->sm"
+                              />
+                            </div>
+                          </td>
+
+                          <td class="h-px whitespace-nowrap">
+                            <x-td-var
+                              :var="$menu->name"
+                            />
+                          </td>
+
+                          <td class="size-px whitespace-nowrap">
+                            <div class="center">
+                              <input type="checkbox"
+                                {{ \App\Helpers\LoginAccess::checkaccess($role['id'], $menu['id']) }}
+                                data-role="{{ $role['id'] }}"
+                                data-menu="{{ $menu['id'] }}"
+                                data-role-name="{{ $role['name'] ?? '' }}"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-400 rounded-md cursor-pointer access-checkbox"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+
+                  <div class="grid app-table-footer">
+                    @if ($menus->lastPage() > 1)
+                      <x-pagination
+                        :pagination="$menus"
+                      />
+                    @endif
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+@endSection
+
+* dan tambahkan input type checkbox di td nya, menyimpan id role dan id menu
 <td class="size-px whitespace-nowrap">
   <div class="center">
     <input type="checkbox"
@@ -72,22 +183,14 @@ access.blade.php
   </div>
 </td>
 
-* selanjutnya buat helper
-public static function checkaccess($roleId, $menuId)
-{
-  .// Mengakses tabel "role_has_menu" di database
-  .// Mencari berdasarkan kolom "role_id" sesuai parameter yang diberikan
-  .// Mencari berdasarkan kolom "menu_id" sesuai parameter yang diberikan
-  .// Mengecek apakah data dengan kombinasi role_id dan menu_id tersebut ada
-  .// Jika data ditemukan, kembalikan string "checked" agar checkbox tercentang di HTML
-  .// Jika data tidak ditemukan, kembalikan string kosong agar checkbox tidak tercentang
-
-  return DB::table('role_has_menu')
-    ->where('role_id', $roleId)
-    ->where('menu_id', $menuId)
-    ->exists() ? 'checked' : '';
-}
-
+* dan buat helper checkaccess di helpernya method checkaccess
+  public static function checkaccess($roleId, $menuId)
+  {
+    return DB::table('role_has_menu')
+      ->where('role_id', $roleId)
+      ->where('menu_id', $menuId)
+      ->exists() ? 'checked' : '';
+  }
 
 
 -->
