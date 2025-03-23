@@ -45,7 +45,7 @@ class Namamodel extent Model
     );
   }
 
-  * [selanjutnya tambahkan ini scope searchnya jika scope searchnya bisa pakai scopeSearch() jika scope searchnya, draft pakai scopeDraft() ]
+  * [selanjutnya tambahkan ini scope searchnya jika scope searchnya bisa pakai scopeSearch() jika scope searchnya]
   * [ini yang kompleks antar relasi models]
   public function scopeSearch(Builder $query, array $filters): void
   {
@@ -63,7 +63,7 @@ class Namamodel extent Model
     );
   }
 
-  * [ini yang single models for scopeSearch() dan scoperDraft()]
+  * [ini yang single models for scopeSearch()]
   public function scopeSearch(Builder $query, array $filters): void
   {
     $fields = ['name'];
@@ -77,6 +77,13 @@ class Namamodel extent Model
         }
       })
     );
+  }
+
+  * [ini jika ada draft scopeDraft]
+  public function scopeDraft(Builder $query, array $filters): void
+  {
+    $query->where('status_id', 1);
+    $this->scopeSearch($query, $filters);
   }
 
   * [selanjutnya jika digunakan kalau ada, untuk mempersingkatkan url di browser]
