@@ -1,0 +1,48 @@
+<!-- 
+
+* [ php artisan make:observer NamamodelObserver -m /to/file.php ]
+
+<?php
+
+namespace App\Observers;
+
+use App\Models\Managemenu\Menu;
+use Illuminate\Support\Facades\Cache;
+
+class MenuObserver
+{
+  /**
+   * Handle the Menu "created" event.
+   */
+  public function created(Menu $menu): void
+  {
+    $this->clearCache();
+  }
+
+  /**
+   * Handle the Menu "updated" event.
+   */
+  public function updated(Menu $menu): void
+  {
+    $this->clearCache();
+  }
+
+  /**
+   * Handle the Menu "deleted" event.
+   */
+  public function deleted(Menu $menu): void
+  {
+    $this->clearCache();
+  }
+
+  /**
+   * Fungsi untuk membersihkan cache
+   */
+  private function clearCache(): void
+  {
+    .// Bersihkan cache berdasarkan pola yang digunakan di controller
+    Cache::forget('menus_index_*');
+  }
+}
+
+-->

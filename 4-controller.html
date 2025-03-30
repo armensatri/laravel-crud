@@ -4,7 +4,7 @@ pertama buat controller sekalian langsung modelsnya
 "php artisan make:controller folder/folder/NamacontrollersController --model=folder/Namamodel"
 Class Controller extends Controller
 {
-  * method index()
+  * method index() [jika tidak ada cache] 
   {
     $namavariabels = User::search(request(['search', 'roles']))
       ->select(['field-1', 'field-2'])
@@ -25,6 +25,28 @@ Class Controller extends Controller
     return view('location.paths.jalur', [
       'title' => 'title nya apa',
       'namavariabels' => $namavariabels
+    ]);
+  }
+
+  * method index(Request $request) [jika menggunakan cache]
+  {
+    $cacheKey = 'menus_index_' . hash('sha256', json_encode(
+      $request->all()
+    ));
+
+    $menus =
+      Cache::remember($cacheKey, 300, function () use ($request) {
+        return Menu::search($request->all())
+          ->select(['id', 'sm', 'name', 'description', 'url'])
+          ->with(['roles', 'submenus'])
+          ->orderBy('sm', 'asc')
+          ->paginate(10)
+          ->withQueryString();
+      });
+
+    return view('backend.managemenu.menus.index', [
+      'title' => 'Semua data menu',
+      'menus' => $menus
     ]);
   }
 

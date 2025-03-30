@@ -7,6 +7,11 @@ class Namamodel extent Model
   * [jika menggunakan sluggable tambahkan ini]
   use Sluggable
 
+  * [jika menggunakan cache observer]
+  protected $observers = [
+    MenuObserver::class,
+  ];
+
   * [nama tablenya apa]
   protected $table = 'namatables';
 
