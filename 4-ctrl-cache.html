@@ -1,26 +1,28 @@
-public function index()
+ public function index()
   {
     $search = request('search');
-    $page = request('page', 1);
     $role = request('role');
-    $cacheVersion = Cache::get('roles_cache_version', 1);
+    $page = request('page', 1);
+    $cacheVersion = Cache::get('users_cache_version', 1);
 
     $cachekey =
       "users_v{$cacheVersion}:search:{$search}:role:{$role}:page:{$page}";
 
-    $roles = Cache::remember(
+    $users = Cache::remember(
       $cachekey,
       now()->addMinutes(5),
       function () {
-        return Role::search(request('search'))
-          ->select()
-          ->orderBy()
-          ->paginate()
+        return User::search(request(['search', 'role']))
+          ->select(['id', 'name', 'username', 'email', 'image', 'role_id', 'url'])
+          ->with(['role'])
+          ->orderBy('id', 'asc')
+          ->paginate(10)
           ->withQueryString();
       }
     );
 
-    return view('backend.manageuser.roles.index', [
-      'title' => 'Semua data roles'
+    return view('backend.manageuser.users.index', [
+      'title' => 'Semua data users',
+      'users' => $users
     ]);
   }
