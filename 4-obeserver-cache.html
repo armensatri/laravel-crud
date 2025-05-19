@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Observers\Manageuser;
+
+use App\Models\Manageuser\User;
+use Illuminate\Support\Facades\Cache;
+
+class UserObserver
+{
+  /**
+   * Handle the User "created" event.
+   */
+  public function created(User $user): void
+  {
+    $this->clearUsersCache();
+  }
+
+  /**
+   * Handle the User "updated" event.
+   */
+  public function updated(User $user): void
+  {
+    $this->clearUsersCache();
+  }
+
+  /**
+   * Handle the User "deleted" event.
+   */
+  public function deleted(User $user): void
+  {
+    $this->clearUsersCache();
+  }
+
+  /**
+   * Handle the User "restored" event.
+   */
+  public function restored(User $user): void
+  {
+    $this->clearUsersCache();
+  }
+
+  /**
+   * Handle the User "force deleted" event.
+   */
+  public function forceDeleted(User $user): void
+  {
+    $this->clearUsersCache();
+  }
+
+  protected function clearUsersCache(): void
+  {
+    Cache::flush();
+  }
+}
+
+
+// PROVIDER
+
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+use App\Models\Manageuser\{
+  Role,
+  User,
+  Permission,
+};
+
+use App\Observers\Manageuser\{
+  UserObserver,
+  RoleObserver,
+  PermissionObserver,
+};
+
+class AppServiceProvider extends ServiceProvider
+{
+  public function register(): void
+  {
+    //
+  }
+
+  public function boot(): void
+  {
+    User::observe(UserObserver::class);
+    Role::observe(RoleObserver::class);
+    Permission::observe(PermissionObserver::class);
+  }
+}
