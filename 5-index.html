@@ -1,6 +1,4 @@
-<!-- 
-
-@extends('backend.template.main')
+<!-- @extends('backend.template.main')
 
 @section('content-backend')
   <div class="content">
@@ -22,48 +20,42 @@
           <div class="flex flex-col">
             <div class="-m-1.5 overflow-x-auto min-w-full">
               <div class="p-1.5 inline-block xl:max-w-full align-middle leading-none">
-                @include('backend.sbreadcrumb.users.index')
+                @include('backend.sbreadcrumb.roles.index')
 
                 <div class="overflow-hidden app-table-border">
                   <div class="grid app-table-grid">
                     <x-description
-                      table-name="Users"
-                      :page-data="$users"
+                      table-name="Roles"
+                      :page-data="$roles"
                     />
 
                     <div class="table-header">
                       <div class="inline-flex items-center gap-x-2">
                         <div class="refresh">
                           <x-refresh
-                            :route="route('users.index')"
+                            :route="route('roles.index')"
                           />
                         </div>
 
                         <div class="search">
-                          <form action="/users">
+                          <form action="/roles">
                             <x-search
-                              search="users"
-                              placeholder="Search data users"
+                              search="roles"
+                              placeholder="Search data roles"
                             />
                           </form>
                         </div>
 
                         <div class="backup">
                           <x-backup
-                            table-name="users"
-                          />
-                        </div>
-
-                        <div class="draft">
-                          <x-draft
-                            :route="route('users.draft')"
+                            table-name="roles"
                           />
                         </div>
 
                         <div class="button-create">
                           <x-button-create
-                            :route="route('users.create')"
-                            button-name="user"
+                            :route="route('roles.create')"
+                            button-name="role"
                           />
                         </div>
                       </div>
@@ -76,35 +68,57 @@
                         <x-th
                           name="no"
                         />
+                        <x-th
+                          name="id"
+                        />
+                        <x-th
+                          name="sr"
+                        />
                         <x-th-action/>
                       </tr>
                     </thead>
 
                     <tbody class="tbody">
-                      @foreach ($users as $user)
+                      @foreach ($roles as $role)
                         <tr>
                           <td class="h-px whitespace-nowrap">
-                            <x-td-var
-                              :var="$loop->iteration . '.'"
-                            />
+                            <div class="center">
+                              <x-td-var
+                                :var="$loop->iteration . '.'"
+                              />
+                            </div>
                           </td>
 
-                          component
+                          <td class="h-px whitespace-nowrap">
+                            <div class="center">
+                              <x-td-var
+                                :var="$role->id"
+                              />
+                            </div>
+                          </td>
+
+                          <td class="h-px whitespace-nowrap">
+                            <div class="center">
+                              <x-td-var
+                                :var="$role->sr"
+                              />
+                            </div>
+                          </td>
 
                           <td class="size-px whitespace-nowrap">
                             <x-td-action
-                              :id="$user->id"
+                              :id="$role->id"
 
                               :show="route(
-                                'users.show', $user->username
+                                'roles.show', $role->url
                               )"
 
                               :edit="route(
-                                'users.edit', $user->username
+                                'roles.edit', $role->url
                                 )"
 
                               :delete="route(
-                                'users.destroy', $user->username
+                                'roles.destroy', $role->url
                               )"
                             />
                           </td>
@@ -114,9 +128,9 @@
                   </table>
 
                   <div class="grid app-table-footer">
-                    @if ($users->lastPage() > 1)
+                    @if ($roles->lastPage() > 1)
                       <x-pagination
-                        :pagination="$users"
+                        :pagination="$roles"
                       />
                     @endif
                   </div>
@@ -128,6 +142,4 @@
       </section>
     </div>
   </div>
-@endSection
-
--->
+@endSection -->
