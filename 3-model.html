@@ -4,6 +4,9 @@
 
 class Namamodel extent Model 
 {
+  * [tambahkan ini dulu untuk search single dan relation]
+  use Searchable;
+
   * [jika menggunakan sluggable tambahkan ini]
   use Sluggable
 
@@ -19,6 +22,25 @@ class Namamodel extent Model
   protected $fillable = [
     'filed',
     'filed',
+  ];
+
+  * [untuk single model search]
+  protected array $sFields = [
+    .// field utama model
+    'name',
+    'username'
+  ];
+
+  * [jika ada relation model search]
+  protected array $sRelations = [
+    .// jika (1) field di dalam relasi
+    'role' => 'name',
+
+    .// jika (banyak) field di dalam relasi
+    'profile' => [
+      'bio',
+      'location'
+    ]
   ];
 
   * [route key name nya apa, ini digunakan dalam route crud]
