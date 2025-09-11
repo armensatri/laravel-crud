@@ -14,22 +14,22 @@
     :id="$user->id"
 
     :show="route(
-      'users.show', $user->username
+      'users.show', $user->url
     )"
 
     :edit="route(
-      'users.edit', $user->username
-      )"
+      'users.edit', $user->url
+    )"
 
     :delete="route(
-      'users.destroy', $user->username
+      'users.destroy', $user->url
     )"
   />
 </td>
 
-* td image
+* td image hover
 <td class="size-px whitespace-nowrap">
-  <x-td-image
+  <x-td-image-hover
     :asset="$user->image"
     asset-default="/image/default.png"
   />
@@ -38,9 +38,9 @@
 * td var bg
 <td class="h-px whitespace-nowrap">
   <x-td-var-bg
-    bg="slate-200"
-    text="slate-800"
-    var="member"
+    :bg="$user->role->bg"
+    :text="$user->role->text"
+    :var="$user->role->name"
   />
 </td>
 
@@ -54,12 +54,7 @@
 </td>
 
 * td var width
-<td class="h-px w-44 min-w-44">
-  <x-td-var-width
-    :var="$prgpath->name"
-    :tooltip="$prgpath->name"
-  />
-</td>
+//
 
 * td var
 <td class="h-px whitespace-nowrap">

@@ -2,21 +2,21 @@
 
 * input
 <x-input
-  label-for="username"
-  label-name="User..username"
+  label-for="name"
+  label-name="User..name"
   type="text"
-  id="username"
-  name="username"
-  value-old="username"
+  id="name"
+  name="name"
+  value-old="name"
   value-default=""
-  error="username"
-  placeholder="Masukkan username user"
+  error="name"
+  placeholder="Masukkan nama user"
 />
 
 * input select
 <x-input-select
   label-for="role_id"
-  label-name="role_id"
+  label-name="User..role"
   id="role_id"
   name="role_id"
   :items="$roles"
@@ -27,7 +27,7 @@
 />
 
 * input image
-<div class="gap-8 mx-auto md:flex">
+<div class="gap-8 xl:gap-14 max-auto md:flex">
   <x-input-image
     label-for="image"
     label-name="User..image"
@@ -45,15 +45,6 @@
 </div>
 
 * input textarea
-<x-input-textarea
-  label-for="description"
-  label-name="User..description"
-  id="description"
-  name="description"
-  value-old="description"
-  value-default=""
-  error="description"
-  placeholder="Masukkan description user"
-/>
+//
 
 -->

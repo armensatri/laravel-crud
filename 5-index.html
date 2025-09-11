@@ -1,61 +1,63 @@
-<!-- @extends('backend.template.main')
+<!-- 
+
+@extends('backend.template.main')
 
 @section('content-backend')
   <div class="content">
     <div class="p-4 mx-auto">
-      <section class="w-full px-4 mb-2">
-        <div class="app-content">
-          <div class="app-content-title">
+      <section class="w-full px-2 mb-2">
+        <div class="content-backend">
+          <div class="content-backend-title">
             {{ $title }}
           </div>
         </div>
       </section>
 
-      @if (session()->has('alert'))
-        @include('sweetalert::alert')
-      @endif
+      <div class="alert">
+        @if (session()->has('alert'))
+          @include('sweetalert::alert')
+        @endif
+      </div>
 
-      <section class="w-full px-4 mt-8 mb-5">
+      <section class="w-full px-3 mt-8 mb-5">
         <div class="max-w-[85rem] mx-auto">
           <div class="flex flex-col">
             <div class="-m-1.5 overflow-x-auto min-w-full">
-              <div class="p-1.5 inline-block xl:max-w-full align-middle leading-none">
-                @include('backend.sbreadcrumb.roles.index')
+              <div class="p-1.5 inline-block xl:max-w-full">
+                <div class="breadcrumb">
+                  @include('backend.sbreadcrumb.users.index')
+                </div>
 
-                <div class="overflow-hidden app-table-border">
-                  <div class="grid app-table-grid">
-                    <x-description
-                      table-name="Roles"
-                      :page-data="$roles"
-                    />
+                <div class="overflow-hidden table-border">
+                  <div class="grid table-grid">
+                    <div class="description">
+                      <x-description
+                        table-name="Users"
+                        :page-data="$users"
+                      />
+                    </div>
 
                     <div class="table-header">
                       <div class="inline-flex items-center gap-x-2">
                         <div class="refresh">
                           <x-refresh
-                            :route="route('roles.index')"
+                            :route="route('users.index')"
                           />
                         </div>
 
                         <div class="search">
-                          <form action="/roles">
+                          <form action="/users">
                             <x-search
-                              search="roles"
-                              placeholder="Search data roles"
+                              search="users"
+                              placeholder="Search data users"
                             />
                           </form>
                         </div>
 
-                        <div class="backup">
-                          <x-backup
-                            table-name="roles"
-                          />
-                        </div>
-
                         <div class="button-create">
                           <x-button-create
-                            :route="route('roles.create')"
-                            button-name="role"
+                            :route="route('users.create')"
+                            button-name="user"
                           />
                         </div>
                       </div>
@@ -71,55 +73,21 @@
                         <x-th
                           name="id"
                         />
-                        <x-th
-                          name="sr"
-                        />
-                        <x-th-action/>
                       </tr>
                     </thead>
 
                     <tbody class="tbody">
-                      @foreach ($roles as $role)
+                      @foreach ($users as $user)
                         <tr>
                           <td class="h-px whitespace-nowrap">
-                            <div class="center">
-                              <x-td-var
-                                :var="$loop->iteration . '.'"
-                              />
-                            </div>
+                            <x-td-var-center
+                              :var="$loop->iteration . '.'"
+                            />
                           </td>
 
                           <td class="h-px whitespace-nowrap">
-                            <div class="center">
-                              <x-td-var
-                                :var="$role->id"
-                              />
-                            </div>
-                          </td>
-
-                          <td class="h-px whitespace-nowrap">
-                            <div class="center">
-                              <x-td-var
-                                :var="$role->sr"
-                              />
-                            </div>
-                          </td>
-
-                          <td class="size-px whitespace-nowrap">
-                            <x-td-action
-                              :id="$role->id"
-
-                              :show="route(
-                                'roles.show', $role->url
-                              )"
-
-                              :edit="route(
-                                'roles.edit', $role->url
-                                )"
-
-                              :delete="route(
-                                'roles.destroy', $role->url
-                              )"
+                            <x-td-var-center
+                              :var="$user->id"
                             />
                           </td>
                         </tr>
@@ -127,10 +95,10 @@
                     </tbody>
                   </table>
 
-                  <div class="grid app-table-footer">
-                    @if ($roles->lastPage() > 1)
+                  <div class="grid table-pagination">
+                    @if ($users->lastPage() > 1)
                       <x-pagination
-                        :pagination="$roles"
+                        :pagination="$users"
                       />
                     @endif
                   </div>
@@ -142,4 +110,6 @@
       </section>
     </div>
   </div>
-@endSection -->
+@endsection
+
+-->

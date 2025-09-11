@@ -1,130 +1,103 @@
 <!-- 
 
-pertama buat controller sekalian langsung modelsnya
-"php artisan make:controller folder/folder/NamacontrollersController --model=folder/Namamodel"
-Class Controller extends Controller
+<?php
+
+namespace App\Http\Controllers\Backend\Manageuser;
+
+use App\Helpers\RandomUrl;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
+use App\Traits\Controllers\ValidationUnique;
+
+use App\Models\Manageuser\{
+  Role,
+  User
+};
+
+use App\Http\Requests\Manageuser\User\{
+  UserSr,
+  UserUr
+};
+
+class UsersController extends Controller
 {
-  * method index() [jika tidak ada cache] 
-  {
-    $namavariabels = User::search(request(['search', 'roles']))
-      ->select(['field-1', 'field-2'])
-      ->with(['relasimodel', 'relasimodels'])
+  * // jika ada file unique panggil trait unique
+  use ValidationUnique;
 
-      [jika dalam 1 model, jika di draft ada atau tidak ada ]
-      ->where('namafield', value)
-      
-      [jika ada relasi antar model, jika di draft ada atau tidak ada ]
-      ->whereHas('status', function ($query) {
-        $query->where('name', '!=', 'draft');
-      })
-      
-      ->orderBy('id', 'asc')
+  /**
+   * Display a listing of the resource.
+   */
+  public function index()
+  {
+    $users = User::query()
+      ->search(request(['search', 'role']))
+      ->select([
+        'id',
+        'image',
+        'name',
+        'email',
+        'role_id',
+        'url'
+      ])
+      ->with(['role:id,name,bg,text'])
+      ->orderby('id', 'asc')
       ->paginate(15)
       ->withQueryString();
 
-    return view('location.paths.jalur', [
-      'title' => 'title nya apa',
-      'namavariabels' => $namavariabels
+    return view('backend.manageuser.users.index', [
+      'title' => 'Semua data users',
+      'users' => $users
     ]);
   }
 
-  * method index(Request $request) [jika menggunakan cache]
-  {
-    $cacheKey = 'menus_index_' . hash('sha256', json_encode(
-      $request->all()
-    ));
-
-    $menus =
-      Cache::remember($cacheKey, 300, function () use ($request) {
-        return Menu::search($request->all())
-          ->select(['id', 'sm', 'name', 'description', 'url'])
-          ->with(['roles', 'submenus'])
-          ->orderBy('sm', 'asc')
-          ->paginate(10)
-          ->withQueryString();
-      });
-
-    return view('backend.managemenu.menus.index', [
-      'title' => 'Semua data menu',
-      'menus' => $menus
-    ]);
-  }
-
-  * method draft()
-  {
-    $namavariabels = User::draft(request(['search', 'roles']))
-      ->select(['field-1', 'field-2'])
-      ->with(['relasimodel', 'relasimodels'])
-
-      [jika dalam 1 model, jika di draft ada atau tidak ada ]
-      ->where('namafield', value)
-      
-      [jika ada relasi antar model, jika di draft ada atau tidak ada ]
-      ->whereHas('status', function ($query) {
-        $query->where('name', '!=', 'draft');
-      })
-
-      ->orderBy('id', 'asc')
-      ->paginate(15)
-      ->withQueryString();
-
-    return view('location.paths.draftname', [
-      'title' => 'title nya apa',
-      'namavariabels' => $namavariabels
-    ]);
-  }
-
-  * method create()
+  /**
+   * Show the form for creating a new resource.
+   */
   public function create(User $user)
   {
-    [jika ada model yang lain panggil]
-    $cobas = Coba::select('field', 'field')
-      ->orderby('id', 'as')
-      ->get()
+    $roles = Role::query()->select('id', 'name')
+      ->orderBy('sr', 'asc')
+      ->get();
 
     return view('backend.manageuser.users.create', [
       'title' => 'Create data user',
       'user' => $user,
-      'panggilmodellain' => $panggilmodellain
+      'roles' => $roles
     ]);
   }
 
-  * method store()
+  /**
+   * Store a newly created resource in storage.
+   */
   public function store(UserSr $request)
   {
-    [panggil validasi di UserSr]
     $datastore = $request->validated();
 
-    [jika ada, mempersingkat url di browser menggunakan random url 5 digit]
-    $datastore['url'] = $request->input('url')
-    ?: RandomUrl::GenerateUrl();
+    $datastore['url'] = RandomUrl::generateUrl();
 
-    [ini untuk image]
     if ($request->hasFile('image')) {
       $datastore['image'] = $request->file('image')->store(
         '/manageuser/users'
       );
     }
 
-    [model di create]
+    $datastore['role_id'] = $request->role_id;
+
     User::create($datastore);
 
-    [ini untuk role]
-    $user = User::create($datastore);
-    $role = Role::findOrFail($request->role_id);
-    $user->assignRole($role);
-
-    [ini alert pesan success]
     Alert::success(
       'success',
       'Data user! berhasil di tambahkan.'
     );
 
-    [redirect table index]
     return redirect()->route('users.index');
   }
 
-  * method show()
+  /**
+   * Display the specified resource.
+   */
   public function show(User $user)
   {
     return view('backend.manageuser.users.show', [
@@ -133,45 +106,42 @@ Class Controller extends Controller
     ]);
   }
 
-  * method edit()
+  /**
+   * Show the form for editing the specified resource.
+   */
   public function edit(User $user)
   {
-    [jika ada model yang lain panggil]
-    $cobas = Coba::select('field', 'field')
-      ->orderby('id', 'as')
-      ->get()
+    $roles = Role::query()->select('id', 'name')
+      ->orderBy('sr', 'asc')
+      ->get();
 
     return view('backend.manageuser.users.edit', [
       'title' => 'Edit data user',
       'user' => $user,
-      'panggilmodellain' => $panggilmodellain
+      'roles' => $roles
     ]);
   }
 
-  * method update()
+  /**
+   * Update the specified resource in storage.
+   */
   public function update(UserUr $request, User $user)
   {
     $dataupdate = $request->validated();
 
-    if (
-      $request->username != $user->username ||
-      $request->email != $user->email
-    ) {
-      $rules = [
-        'username' => 'unique:users,username' . $user->id,
-        'email' => 'unique:users,email' . $user->id,
-      ];
-
-      $messages = [
+    * // field unique dan messagenya 
+    $this->fieldUnique(
+      $request,
+      $user,
+      ['username', 'email'],
+      [
         'username.unique' => 'User..username! sudah terdaptar',
-        'email.unique' => 'User..email! sudah terdaptar',
-      ];
-
-      $request->validate($rules, $messages);
-    }
+        'email.unique'    => 'User..email! sudah terdaptar',
+      ]
+    );
 
     if ($request->hasFile('image')) {
-      if ($user->image != null) {
+      if (!empty($user->image)) {
         Storage::delete($user->image);
       }
 
@@ -180,12 +150,9 @@ Class Controller extends Controller
       );
     }
 
-    $user->update($dataupdate);
+    $dataupdate['role_id'] = $request->role_id;
 
-    if ($request->has('role_id')) {
-      $role = Role::findOrFail($request->role_id);
-      $user->syncRoles($role);
-    }
+    $user->update($dataupdate);
 
     Alert::success(
       'success',
@@ -195,10 +162,12 @@ Class Controller extends Controller
     return redirect()->route('users.index');
   }
 
-  * method destroy()
+  /**
+   * Remove the specified resource from storage.
+   */
   public function destroy(User $user)
   {
-    if (in_array($user->name, ['Armen Satri'])) {
+    if (in_array($user->username, ['armensatri'])) {
       Alert::warning(
         'Oops...',
         'Data user! tidak bisa di delete.'
@@ -219,21 +188,6 @@ Class Controller extends Controller
     );
 
     return redirect()->route('users.index');
-  }
-
-  * method slug
-  /**
-   * Generate resource slug otomatis.
-   */
-  public function slug(Request $request)
-  {
-    $slug = SlugService::createSlug(
-      Role::class,
-      'slug',
-      $request->name
-    );
-
-    return response()->json(['slug' => $slug]);
   }
 }
 

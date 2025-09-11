@@ -5,18 +5,20 @@
 @section('content-backend')
   <div class="content">
     <div class="p-4 mx-auto">
-      <section class="w-full px-4 mb-2">
-        <div class="app-content">
-          <div class="app-content-title">
+      <section class="w-full px-2 mb-2">
+        <div class="content-backend">
+          <div class="content-backend-title">
             {{ $title }}
           </div>
         </div>
       </section>
 
-      <section class="w-full px-4 mt-8 mb-5">
-        @include('backend.sbreadcrumb.users.show')
-        
-        <div class="app-cse-border">
+      <section class="w-full px-3 mt-8 mb-5">
+        <div class="breadcrumb">
+          @include('backend.sbreadcrumb.users.show')
+        </div>
+
+        <div class="x-border">
           <div class="max-w-xl py-4 mx-auto text-center">
             <div class="text-xl font-semibold tracking-wide text-gray-900 uppercase md:text-2xl">
               user - {{ $user->name }}
@@ -24,22 +26,27 @@
           </div>
 
           <div class="mt-6 space-y-4 sm:mt-8">
-            <x-show-data
+            <x-show-var
               name="Id"
               :var="$user->id"
             />
 
-            <x-show-data
+            <x-show-var
+              name="Url"
+              :var="$user->url"
+            />
+
+            <x-show-var
               name="Create"
               :var="$user->created_at->format('d-m-Y - H:i:s')"
             />
 
-            <x-show-data
+            <x-show-var
               name="Update"
               :var="$user->updated_at->format('d-m-Y - H:i:s')"
             />
 
-            <x-show-data
+            <x-show-var
               name="Publish"
               :var="$user->created_at->diffForHumans()"
             />
@@ -48,6 +55,6 @@
       </section>
     </div>
   </div>
-@endsection
+@endsection 
 
 -->

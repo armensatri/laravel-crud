@@ -2,142 +2,98 @@
 
 * buat model nya menggunakan comand line  "php artisan make::model folder/Namamodel" nama model huruf pertama harus huru besar
 
-class Namamodel extent Model 
+<?php
+
+namespace App\Models\Manageuser;
+
+use App\Models\Manageuser\Role;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+* // jika namespacenya sama gabungkan
+use App\Traits\Models\{
+  HasRandomUrl,
+  HasSearchable
+};
+
+class User extends Authenticatable
 {
-  * [tambahkan ini dulu untuk search single dan relation]
-  use Searchable;
+  * // panggil ke tiga ini
+  use HasSugglable, HasRandomUrl, HasSearchable;
 
-  * [jika menggunakan sluggable tambahkan ini]
-  use Sluggable
+  * // nama table
+  protected $table = 'users';
 
-  * [jika menggunakan cache observer]
-  protected $observers = [
-    MenuObserver::class,
-  ];
+  * // (sluggable) defaultnya 'name' jika beda tulis fieldnya
+  protected $sluggable = 'name';
 
-  * [nama tablenya apa]
-  protected $table = 'namatables';
-
-  * [field yang di isi apa saja]
+  * // file yang di isi
   protected $fillable = [
-    'filed',
-    'filed',
-  ];
-
-  * [untuk single model search]
-  protected array $sFields = [
-    .// field utama model
     'name',
-    'username'
+    'username',
+    'email',
+    'password',
+    'image',
+    'role_id',
+    'status_on_of',
+    'last_seen',
+    'url'
   ];
 
-  * [jika ada relation model search]
-  protected array $sRelations = [
-    .// jika (1) field di dalam relasi
-    'role' => 'name',
+  * // (HasSearchable) jika search single model
+  protected $sFields = [
+    'name'
+  ];
 
-    .// jika (banyak) field di dalam relasi
+  * // (HasSearcable) tambahkan search relasi jika ada pencarian relasi
+  protected $sRelations = [
+    * // jika (1) field di dalam relasi
+      'role' => 'name',
+    
+    * // jika (banyak) field di dalam relasi
     'profile' => [
       'bio',
       'location'
     ]
   ];
 
-  * [route key name nya apa, ini digunakan dalam route crud]
-  public function getRouteKeyName()
-  {
-    return 'namafiledcrud';
-  }
+  * // khusus untuk model user
+  protected $hidden = [
+    'password'
+  ];
 
-  * [tambahkan ini jika menggunakan sluggable]
-  public function sluggable(): array
+  * // khusus untuk model user
+  protected function casts()
   {
     return [
-      'slug' => [
-        'source' => 'fileyangdibuatkanslugotomatis'
-      ]
+      'password' => 'hashed'
     ];
   }
 
-  * [selanjutnya tambahkan jika ada relasi antar models] belongsTo or hasMany
-
-  * [jika ada relasi vipot]
-  public function menus()
+  * // crud berdasarkan field route name
+  public function getRouteKeyName()
   {
-    return $this->belongsToMany(
-      Menu::class,
-      'role_has_menu', // nama table vipot
-      'role_id', // primary key
-      'menu_id' // primary key
-    );
+    return 'url';
   }
 
-  * [selanjutnya tambahkan ini scope searchnya jika scope searchnya bisa pakai scopeSearch() jika scope searchnya]
-  * [ini yang kompleks antar relasi models]
-  public function scopeSearch(Builder $query, array $filters): void
+  * // relasi antar model
+  public function role()
   {
-    $fields = ['name', 'views'];
+    return $this->belongsTo(Role::class, 'role_id', 'id');
+  }
 
-    $relations = [
-      'status' => 'name'
+  * // optional
+  public function statusOnOf()
+  {
+    $online = $this->status_on_of;
+    $color = $online ? 'green' : 'red';
+
+    return [
+      'bg' => "bg-{$color}-200",
+      'text' => "text-{$color}-800",
+      'statusOnOf' => $online ? 'online' : 'offline',
     ];
-
-    $query->when(
-      $filters['search'] ?? false,
-      function ($query, $search) use ($fields, $relations) {
-        Searching::applySearch($query, $search, $fields, $relations);
-      }
-    );
   }
-
-  * [ini yang single models for scopeSearch()]
-  public function scopeSearch(Builder $query, array $filters): void
-  {
-    $fields = ['name'];
-
-    $query->when(
-      $filters['search'] ?? false,
-      fn($query, $search) =>
-      $query->where(function ($query) use ($search, $fields) {
-        foreach ($fields as $field) {
-          $query->orWhere($field, 'like', '%' . $search . '%');
-        }
-      })
-    );
-  }
-
-  * [ini jika ada draft scopeDraft]
-  public function scopeDraft(Builder $query, array $filters): void
-  {
-    $query->where('status_id', 1);
-    $this->scopeSearch($query, $filters);
-  }
-
-  * [selanjutnya jika digunakan kalau ada, untuk mempersingkatkan url di browser]
-  protected static function boot()
-  {
-    parent::boot();
-
-    static::saving(function ($path) {
-      if (empty($path->url)) {
-        do {
-          $url = RandomUrl::GenerateUrl();
-        } while (Prgpath::where('url', $url)->exists());
-
-        $path->url = $url;
-      }
-    });
-  }
-
-  * optional ambil data manipulasi data
-  public function active(): array
-  {
-    return $this->is_active
-      ? ['bg' => 'green-200', 'text' => 'green-800', 'status' => 'active']
-      : ['bg' => 'red-200', 'text' => 'red-800', 'status' => '!active'];
-  }
-
-  * jika ada yang lain, optinal saja
 }
+
 
 -->
