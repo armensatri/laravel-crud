@@ -1,15 +1,9 @@
-<ol class="flex items-center gap-[4px] mb-5 ml-2">
+<ol class="flex items-center gap-[5px] mb-5 ml-2">
   <x-breadcrumb-icon
-    image="/backend/img/menu/users.jpg"
+    :image="asset('backend/img/menu/users.jpg')"
   />
 
   <x-slash/>
 
-  <x-breadcrumb-name name="users"/>
-
-  <x-slash/>
-
-  <x-breadcrumb-name :name="'@' . $user->username"
-    class="text-blue-600"
-  />
+  <x-breadcrumb-name name="users" class="text-blue-600"/>
 </ol>
