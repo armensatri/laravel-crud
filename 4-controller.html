@@ -189,6 +189,20 @@ class UsersController extends Controller
 
     return redirect()->route('users.index');
   }
+
+  /**
+   * Generate resource slug otomatis.
+   */
+  public function slug(Request $request)
+  {
+    $slug = SlugService::createSlug(
+      Role::class,
+      'slug',
+      $request->name
+    );
+
+    return response()->json(['slug' => $slug]);
+  }
 }
 
 -->
