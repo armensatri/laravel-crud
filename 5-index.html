@@ -73,6 +73,7 @@
                         <x-th
                           name="id"
                         />
+                        <x-th-action/>
                       </tr>
                     </thead>
 
@@ -88,6 +89,24 @@
                           <td class="h-px whitespace-nowrap">
                             <x-td-var-center
                               :var="$user->id"
+                            />
+                          </td>
+
+                          <td class="size-px whitespace-nowrap">
+                            <x-td-action
+                              :id="$user->id"
+
+                              :show="route(
+                                'users.show', $user->url
+                              )"
+
+                              :edit="route(
+                                'users.edit', $user->url
+                              )"
+
+                              :delete="route(
+                                'users.destroy', $user->url
+                              )"
                             />
                           </td>
                         </tr>

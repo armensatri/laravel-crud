@@ -24,8 +24,9 @@
 * show action
 <x-show-action
   name="Action"
-  :edit="route('users.edit', $user->url)"
-  :delete="route('users.destroy', $user->url)"
+  :indexs="route('roles.index')"
+  :edit="route('roles.edit', $role->url)"
+  :delete="route('roles.destroy', $role->url)"
 />
 
 * show text color
