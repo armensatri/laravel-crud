@@ -5,14 +5,38 @@ namespace App\Observers\Manageuser;
 use App\Models\Manageuser\User;
 use Illuminate\Support\Facades\Cache;
 
+<?php
+
+namespace App\Observers;
+
+use App\Models\Manageuser\User;
+use Illuminate\Support\Facades\Cache;
+
 class UserObserver
 {
+  private function clearCache(User $user)
+  {
+    $keys = [
+      "dashboard_owner_{$user->id}",
+      "dashboard_superadmin_{$user->id}",
+      "dashboard_creator_{$user->id}",
+      "dashboard_member_{$user->id}",
+
+      "account_profile_{$user->id}",
+      "account_profile_edit_{$user->id}",
+    ];
+
+    foreach ($keys as $key) {
+      Cache::forget($key);
+    }
+  }
+
   /**
    * Handle the User "created" event.
    */
   public function created(User $user): void
   {
-    $this->clearUsersCache();
+    $this->clearCache($user);
   }
 
   /**
@@ -20,7 +44,7 @@ class UserObserver
    */
   public function updated(User $user): void
   {
-    $this->clearUsersCache();
+    $this->clearCache($user);
   }
 
   /**
@@ -28,63 +52,6 @@ class UserObserver
    */
   public function deleted(User $user): void
   {
-    $this->clearUsersCache();
-  }
-
-  /**
-   * Handle the User "restored" event.
-   */
-  public function restored(User $user): void
-  {
-    $this->clearUsersCache();
-  }
-
-  /**
-   * Handle the User "force deleted" event.
-   */
-  public function forceDeleted(User $user): void
-  {
-    $this->clearUsersCache();
-  }
-
-  protected function clearUsersCache(): void
-  {
-    Cache::flush();
-  }
-}
-
-
-// PROVIDER
-
-<?php
-
-namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-
-use App\Models\Manageuser\{
-  Role,
-  User,
-  Permission,
-};
-
-use App\Observers\Manageuser\{
-  UserObserver,
-  RoleObserver,
-  PermissionObserver,
-};
-
-class AppServiceProvider extends ServiceProvider
-{
-  public function register(): void
-  {
-    //
-  }
-
-  public function boot(): void
-  {
-    User::observe(UserObserver::class);
-    Role::observe(RoleObserver::class);
-    Permission::observe(PermissionObserver::class);
+    $this->clearCache($user);
   }
 }

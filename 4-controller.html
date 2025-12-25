@@ -100,6 +100,15 @@ class UsersController extends Controller
    */
   public function show(User $user)
   {
+    * jika ada? 1 relasi
+    $user->load('role:id,name,bg,text');
+
+    * jika ada? 2 relasi
+    $user->load([
+      'role:id,name,bg,text',
+      'role:id,name,bg,text',
+    ]);
+
     return view('backend.manageuser.users.show', [
       'title' => 'Detail data user',
       'user' => $user

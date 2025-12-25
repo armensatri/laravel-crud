@@ -1,25 +1,154 @@
-public function index()
+<!-- * app/Traits/HasCacheVersion.php -->
+namespace App\Traits;
+
+use Illuminate\Support\Facades\Cache;
+
+trait HasCacheVersion
+{
+  /**
+   * Unique cache version key per model
+   */
+  protected static function cacheVersionKey(): string
   {
-    $cacheKey =
-      'manageuser_users_page_' . request()->get('page', 1) .
-      '_search_' . request('search') .
-      '_role_' . request('role');
+    return static::class . '.cache.version';
+  }
 
-    $users = Cache::remember(
-      $cacheKey,
-      $this->cacheExpiration,
-      function () {
-        return User::search(request(['search', 'role']))
-          ->select(['id', 'name', 'username', 'email', 'image', 'role_id', 'url'])
-          ->with(['role'])
-          ->orderBy('id', 'asc')
-          ->paginate(10)
-          ->withQueryString();
-      }
+  /**
+   * Get current cache version
+   */
+  public static function cacheVersion(): string
+  {
+    return Cache::rememberForever(
+      static::cacheVersionKey(),
+      fn () => (string) now()->timestamp
     );
+  }
 
-    return view('backend.manageuser.users.index', [
-      'title' => 'Semua data users',
-      'users' => $users
+  /**
+   * Bump cache version (invalidate all index cache)
+   */
+  public static function bumpCacheVersion(): void
+  {
+    Cache::forever(
+      static::cacheVersionKey(),
+      (string) now()->timestamp
+    );
+  }
+}
+
+<!-- * di models tambahkan trait -->
+use HasCacheVersion;
+
+<!-- * controller -->
+use App\Models\Programming\Playlist;
+use Illuminate\Support\Facades\Cache;
+
+public function index()
+{
+  // 1. Ambil filter
+  $filters = request(['search', 'roadmap', 'status']);
+
+  // 2. Buat cache key
+  $cacheKey = 'playlists.index.ids.'
+    . Playlist::cacheVersion() . '.'
+    . md5(json_encode($filters));
+
+  // 3. Cache ID hasil search
+  $ids = Cache::remember(
+    $cacheKey,
+    now()->addMinutes(10),
+    fn () => Playlist::query()
+      ->search($filters)
+      ->orderBy('roadmap_id', 'asc')
+      ->pluck('id')
+      ->toArray()
+  );
+
+  // 4. Query utama (pagination TIDAK dicache)
+  $playlists = Playlist::query()
+    ->whereIn('id', $ids)
+    ->select([
+      'id',
+      'roadmap_id',
+      'spl',
+      'name',
+      'status_id',
+      'url'
+    ])
+    ->with([
+      'status:id,name,bg,text',
+      'roadmap:id,name'
+    ])
+    ->orderBy('roadmap_id', 'asc')
+    ->paginate(10)
+    ->withQueryString();
+
+  return view('backend.programming.playlists.index', [
+    'title' => 'Semua data playlists',
+    'playlists' => $playlists
+  ]);
+}
+
+<!-- * observernya -->
+namespace App\Observers;
+
+use App\Models\Programming\Playlist;
+use Illuminate\Support\Facades\Cache;
+
+class PlaylistObserver
+{
+  public function created(Playlist $playlist): void
+  {
+    $this->invalidate($playlist);
+  }
+
+  public function updated(Playlist $playlist): void
+  {
+    $this->invalidate($playlist);
+  }
+
+  public function deleted(Playlist $playlist): void
+  {
+    $this->invalidate($playlist);
+  }
+
+  protected function invalidate(Playlist $playlist): void
+  {
+    // invalidate semua cache index
+    Playlist::bumpCacheVersion();
+
+    // hilangkan show di observer
+    // invalidate detail page (jika ada)
+    Cache::forget('playlists.show.' . $playlist->id);
+  }
+}
+
+<!-- * register observer di app service provider -->
+use App\Models\Programming\Playlist;
+use App\Observers\PlaylistObserver;
+
+public function boot(): void
+{
+  Playlist::observe(PlaylistObserver::class);
+}
+
+<!-- * di model show jika ada relasi -->
+public function show(User $user)
+  {
+    // jika ada 1 relasi
+    $user->load('role:id,name,bg,text');
+
+    // jika ada 2 relasi
+    $user->load([
+      'role:id,name,bg,text',
+      'role:id,name,bg,text',
+    ]);
+
+    return view('backend.manageuser.users.show', [
+      'title' => 'Detail data user',
+      'user' => $user
     ]);
   }
+
+
+
