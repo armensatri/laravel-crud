@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
-use App\Traits\Controllers\ValidationUnique;
 
 use App\Models\Manageuser\{
   Role,
@@ -21,10 +20,19 @@ use App\Http\Requests\Manageuser\User\{
   UserUr
 };
 
+use App\Traits\Controllers\{
+  ImageStore,
+  ImageUpdate
+  ValidationUnique,
+};
+
+
 class UsersController extends Controller
 {
   * // jika ada file unique panggil trait unique
   use ValidationUnique;
+  * // jika ada upload file image store dan update
+  use ImageUpdate, ImageStore;
 
   /**
    * Display a listing of the resource.
@@ -77,11 +85,12 @@ class UsersController extends Controller
 
     $datastore['url'] = RandomUrl::generateUrl();
 
-    if ($request->hasFile('image')) {
-      $datastore['image'] = $request->file('image')->store(
-        '/manageuser/users'
-      );
-    }
+    * // imageUpdate
+    $datastore['image'] = $this->handleImageStore(
+      $request,
+      'image',
+      'manageuser/users'
+    );
 
     $datastore['role_id'] = $request->role_id;
 
@@ -149,15 +158,13 @@ class UsersController extends Controller
       ]
     );
 
-    if ($request->hasFile('image')) {
-      if (!empty($user->image)) {
-        Storage::delete($user->image);
-      }
-
-      $dataupdate['image'] = $request->file('image')->store(
-        '/manageuser/users'
-      );
-    }
+    * // imageUpdate
+    $dataupdate['image'] = $this->handleImageUpdate(
+      $request,
+      $user,
+      'image',
+      'manageuser/users'
+    );
 
     $dataupdate['role_id'] = $request->role_id;
 
