@@ -31,5 +31,13 @@
     );
 
 * // method biasa()
+      Alert::html(
+        'Oops...', // tulisan besar
+        "Data user! role
+        <span style='color:#2563eb;'>
+          {$user->role->name} // message
+        </span> tidak bisa di delete",
+        'warning' // icon
+      );
 
 -->
